@@ -144,3 +144,82 @@ func Handle(req []byte) string {
 	}
 	return ""
 }
+
+func MultipleUpdateObject(url, tableSlug, appId string, request Request) error {
+	_, err := DoRequest(url+"/v1/object/multiple-update/"+tableSlug, "PUT", request, appId)
+	// fmt.Println("resp", string(resp), "err", err)
+	if err != nil {
+		return errors.New("error while updating multiple objects" + err.Error())
+	}
+	return nil
+}
+
+func sortHours(timeStrings []string) ([]time.Time, error) {
+	// Parse the time strings into time.Time objects
+	times := make([]time.Time, len(timeStrings))
+	for i, str := range timeStrings {
+		parsedTime, err := time.Parse("15:04:05", str)
+		if err != nil {
+			// fmt.Println("Error parsing time:", err)
+			return nil, err
+		}
+		parsedTime = parsedTime.Add(time.Hour * -5)
+		times[i] = parsedTime
+	}
+
+	// Sort the time.Time objects
+	sort.Slice(times, func(i, j int) bool {
+		return times[i].Before(times[j])
+	})
+
+	// // Format the sorted times as strings
+	// sortedTimeStrings := make([]string, len(times))
+	// for i, t := range times {
+	// 	sortedTimeStrings[i] = t.Format("15:04:05")
+	// }
+
+	return times, nil
+}
+
+func getNextDate(current time.Time, days []int, times []time.Time) time.Time {
+	nextDate := current
+
+	// Get next hour
+	var nextTime time.Time
+
+	for _, t := range times {
+		if t.Hour() == current.Hour() {
+			if t.Minute() > current.Minute() {
+				nextTime = t
+				break
+			}
+		} else if t.Hour() > current.Hour() {
+			nextTime = t
+			break
+		}
+	}
+
+	if nextTime == (time.Time{}) {
+		nextTime = times[0]
+		nextDate = nextDate.AddDate(0, 0, 1)
+	}
+	// current day of the week
+	currentDay := int(nextDate.Weekday())
+
+	// iterate days array and find next upcoming day
+	addition := -1
+	for _, day := range days {
+		if day >= currentDay {
+			addition = day - currentDay
+			nextDate = nextDate.AddDate(0, 0, day-currentDay)
+			break
+		}
+	}
+	if addition == -1 {
+		nextDate = nextDate.AddDate(0, 0, days[0]+7-currentDay)
+	}
+
+	// Combine the next date and time
+	nextDateTime := time.Date(nextDate.Year(), nextDate.Month(), nextDate.Day(), nextTime.Hour(), nextTime.Minute(), nextTime.Second(), 0, nextDate.Location())
+	return nextDateTime
+}
