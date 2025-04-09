@@ -1,0 +1,25 @@
+version: 1.0
+provider:
+  name: openfaas
+  gateway: https://ofs.u-code.io
+functions:
+  madadio-create-patient-medication-cron:
+    lang: go
+    handler: ./madadio-create-patient-medication-cron
+    image: gitlab.udevs.io:5050/ucode_functions_group/madadio-create-patient-medication-cron/madadio-create-patient-medication-cron:latest
+    constraints:
+    - "workload=openfaas-fn"
+    # environment:
+    #   sleep_duration: 10
+    #   read_timeout: "500s"
+    #   write_timeout: "500s"
+    #   exec_timeout: "500s"
+    # annotations:
+    #   topic: cron-function
+    #   schedule: "0 1 1 1 *"
+
+
+    limits:
+      memory: 300Mi
+    requests:
+      memory: 5Mi
