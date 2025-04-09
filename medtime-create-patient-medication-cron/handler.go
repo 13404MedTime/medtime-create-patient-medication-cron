@@ -333,3 +333,56 @@ func DeleteObject(url, tableSlug, appId, guid string) (error, Response) {
 	}
 	return nil, response
 }
+
+func DoRequest(url string, method string, body interface{}, appId string) ([]byte, error) {
+	data, err := json.Marshal(&body)
+	if err != nil {
+		return nil, err
+	}
+	client := &http.Client{
+		Timeout: time.Duration(30 * time.Second),
+	}
+	request, err := http.NewRequest(method, url, bytes.NewBuffer(data))
+	if err != nil {
+		return nil, err
+	}
+	request.Header.Add("authorization", "API-KEY")
+	request.Header.Add("X-API-KEY", appId)
+
+	resp, err := client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	respByte, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return respByte, nil
+}
+
+func Handler(status, message string) string {
+	var (
+		response Response
+		Message  = make(map[string]interface{})
+	)
+
+	Send(status + message)
+	response.Status = status
+	Message["message"] = message
+	response.Data = Message
+	respByte, _ := json.Marshal(response)
+	return string(respByte)
+
+}
+
+func Send(text string) {
+	bot, _ := tgbotapi.NewBotAPI(botToken)
+
+	chatID := int64(chatID)
+	msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("message from madad payme route function: %s", text))
+
+	bot.Send(msg)
+
+}
