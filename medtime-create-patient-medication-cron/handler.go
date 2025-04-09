@@ -223,3 +223,113 @@ func getNextDate(current time.Time, days []int, times []time.Time) time.Time {
 	nextDateTime := time.Date(nextDate.Year(), nextDate.Month(), nextDate.Day(), nextTime.Hour(), nextTime.Minute(), nextTime.Second(), 0, nextDate.Location())
 	return nextDateTime
 }
+
+// func addToNotifTable(timeTake, preparatId, clientId, appId, tableSlug string) {
+// 	notifRequest := Request{
+// 		Data: map[string]interface{}{
+// 			"client_id":    clientId,
+// 			"title":        "Время принятия препарата!",
+// 			"body":         "Вам назначен препарат: ",
+// 			"title_uz":     "Preparatni qabul qilish vaqti bo'ldi!",
+// 			"body_uz":      "Sizga preparat tayinlangan: ",
+// 			"is_read":      false,
+// 			"preparati_id": preparatId,
+// 			"time_take":    timeTake,
+// 		},
+// 	}
+// 	urlConst := "https://api.admin.u-code.io"
+// 	CreateObject(urlConst, tableSlug, appId, notifRequest)
+// }
+
+func GetListObject(url, tableSlug, appId string, request Request) (GetListClientApiResponse, error, Response) {
+	response := Response{}
+
+	getListResponseInByte, err := DoRequest(url+"/v1/object/get-list/"+tableSlug+"?from-ofs=true", "POST", request, appId)
+	if err != nil {
+		response.Data = map[string]interface{}{"message": "Error while getting list of object"}
+		response.Status = "error"
+		return GetListClientApiResponse{}, errors.New("error"), response
+	}
+	var getListObject GetListClientApiResponse
+	err = json.Unmarshal(getListResponseInByte, &getListObject)
+	if err != nil {
+		response.Data = map[string]interface{}{"message": "Error while unmarshalling get list object"}
+		response.Status = "error"
+		return GetListClientApiResponse{}, errors.New("error"), response
+	}
+	return getListObject, nil, response
+}
+
+func GetSingleObject(url, tableSlug, appId, guid string) (ClientApiResponse, error, Response) {
+	response := Response{}
+
+	var getSingleObject ClientApiResponse
+	getSingleResponseInByte, err := DoRequest(url+"/v1/object/{table_slug}/{guid}?from-ofs=true", "GET", nil, appId)
+	if err != nil {
+		response.Data = map[string]interface{}{"message": "Error while getting single object"}
+		response.Status = "error"
+		return ClientApiResponse{}, errors.New("error"), response
+	}
+	err = json.Unmarshal(getSingleResponseInByte, &getSingleObject)
+	if err != nil {
+		response.Data = map[string]interface{}{"message": "Error while unmarshalling single object"}
+		response.Status = "error"
+		return ClientApiResponse{}, errors.New("error"), response
+	}
+	return getSingleObject, nil, response
+}
+
+func CreateObject(url, tableSlug, appId string, request Request) (Datas, error, Response) {
+	response := Response{}
+
+	var createdObject Datas
+	createObjectResponseInByte, err := DoRequest(url+"/v1/object/"+tableSlug+"?from-ofs=true&project-id=a4dc1f1c-d20f-4c1a-abf5-b819076604bc", "POST", request, appId)
+	if err != nil {
+		response.Data = map[string]interface{}{"message": "Error while creating object"}
+		response.Status = "error"
+		return Datas{}, errors.New("error"), response
+	}
+	err = json.Unmarshal(createObjectResponseInByte, &createdObject)
+	if err != nil {
+		response.Data = map[string]interface{}{"message": "Error while unmarshalling create object object"}
+		response.Status = "error"
+		return Datas{}, errors.New("error"), response
+	}
+	return createdObject, nil, response
+}
+
+func UpdateObject(url, tableSlug, appId string, request Request) (error, Response) {
+	response := Response{}
+
+	_, err := DoRequest(url+"/v1/object/{table_slug}?from-ofs=true", "PUT", request, appId)
+	if err != nil {
+		response.Data = map[string]interface{}{"message": "Error while updating object"}
+		response.Status = "error"
+		return errors.New("error"), response
+	}
+	return nil, response
+}
+
+func UpdateObjectMany2Many(url, appId string, request RequestMany2Many) (error, Response) {
+	response := Response{}
+
+	_, err := DoRequest(url+"/v1/many-to-many/", "PUT", request, appId)
+	if err != nil {
+		response.Data = map[string]interface{}{"message": "Error while updating object"}
+		response.Status = "error"
+		return errors.New("error"), response
+	}
+	return nil, response
+}
+
+func DeleteObject(url, tableSlug, appId, guid string) (error, Response) {
+	response := Response{}
+
+	_, err := DoRequest(url+"/v1/object/{table_slug}/{guid}?from-ofs=true", "DELETE", Request{}, appId)
+	if err != nil {
+		response.Data = map[string]interface{}{"message": "Error while updating object"}
+		response.Status = "error"
+		return errors.New("error"), response
+	}
+	return nil, response
+}
