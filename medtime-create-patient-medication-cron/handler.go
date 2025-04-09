@@ -142,6 +142,187 @@ func Handle(req []byte) string {
 			}
 		}
 	}
+
+	// for medicine_taking_id, v := range patientMedicationsHour {
+	// 	var (
+	// 		timeTakeStr string
+	// 		timeTake    time.Time
+	// 	)
+
+	// 	patientMedicationLastHour, ok := v.(map[string]interface{})
+	// 	if ok {
+	// 		timeTakeStr, _ = patientMedicationLastHour["time_take"].(string)
+	// 		timeTake, _ = time.Parse("2006-01-02T15:04:05.000Z", timeTakeStr)
+	// 	} else {
+	// 		timeTake = time.Now()
+	// 	}
+	// 	// fmt.Println(timeTake)
+	// 	if nextData2.After(timeTake) {
+	// 		Send("medicine_taking_id: " + medicine_taking_id + "TimeTake: " + timeTake.String() + "nextDate" + nextData2.String())
+	// 		medicineTaking, ok := medicineTakings[medicine_taking_id]
+	// 		if ok {
+	// 			var (
+	// 				medicine          Medicine
+	// 				clientId          string
+	// 				medicineTakingInt = medicineTaking.(map[string]interface{})
+	// 			)
+
+	// 			if medicineTakingInt["cleints_id"] != nil {
+	// 				clientId = medicineTakingInt["cleints_id"].(string)
+	// 			}
+
+	// 			body := medicineTakingInt["json_body"].(string)
+	// 			err = json.Unmarshal([]byte(body), &medicine)
+	// 			if err != nil {
+	// 				return Handler("error 2", err.Error())
+
+	// 			}
+
+	// 			days := []int{0, 1, 2, 3, 4, 5, 6}
+
+	// 			frequencyInt, _ := medicineTakingInt["frequency"].([]interface{})
+	// 			if len(frequencyInt) < 1 {
+	// 				return Handler("error 3", err.Error())
+
+	// 			}
+
+	// 			sort.Ints(days)
+
+	// 			timeString := medicine.HoursOfDay
+	// 			sortedTimes, _ := sortHours(timeString)
+	// 			if len(sortedTimes) < 1 {
+	// 				continue
+	// 			}
+
+	// 			var dosage float64
+	// 			dosageStr, ok := medicineTakingInt["dosage"].(string)
+	// 			if ok {
+	// 				dosageInt, err := strconv.Atoi(dosageStr)
+	// 				if err != nil {
+	// 					return Handler("error 3", err.Error())
+
+	// 				}
+	// 				dosage = float64(dosageInt)
+
+	// 			} else {
+
+	// 				dosage, ok = medicineTakingInt["dosage"].(float64)
+	// 				if !ok {
+	// 					Send("failed to get dosage; medicineTakingGuid:" + medicineTakingInt["guid"].(string))
+	// 					continue
+
+	// 				}
+
+	// 			}
+
+	// 			var (
+	// 				afterFoodInt  = medicineTakingInt["description"].([]interface{})
+	// 				afterFoodList = []string{}
+	// 			)
+
+	// 			for _, v := range afterFoodInt {
+	// 				val, _ := v.(string)
+	// 				afterFoodList = append(afterFoodList, val)
+	// 			}
+
+	// 			var (
+	// 				boolAfterFood = afterFoodList[0]
+	// 				preparatId, _ = medicineTakingInt["preparati_id"].(string)
+	// 				requests      = []map[string]interface{}{}
+	// 				notifRequests = MultipleUpdateRequest{}
+	// 				currentTime   =  timeTake
+	// 			)
+	// 			// fmt.Println(, "currentTime", currentTime)
+	// 			for nextData1.After(currentTime) {
+	// 				timeee := getNextDate(currentTime, days, sortedTimes)
+	// 				fmt.Println("timeee", timeee)
+	// 				currentTime = timeee
+	// 				var (
+	// 					serverTime           = currentTime
+	// 					stringTime           = serverTime.Format("2006-01-02T15:04:05.000Z")
+	// 					preparatName, _      = medicineTakingInt["medicine_name"].(string)
+	// 					createtObjectRequest = map[string]interface{}{
+	// 						"medicine_taking_id": medicineTakingInt["guid"].(string),
+	// 						"time_take":          stringTime,
+	// 						"before_after_food":  boolAfterFood,
+	// 						"cleints_id":         clientId,
+	// 						"preparati_id":       preparatId,
+	// 						"is_from_patient":    true,
+	// 						"count":              dosage,
+	// 						"preparat_name":      preparatName,
+	// 					}
+	// 				)
+
+	// 				requests = append(requests, createtObjectRequest)
+
+	// 				notifRequests.Data.Objects = append(notifRequests.Data.Objects, map[string]interface{}{
+	// 					"client_id":    clientId,
+	// 					"title":        "Время принятия препарата!",
+	// 					"body":         "Вам назначен препарат: ",
+	// 					"title_uz":     "Preparatni qabul qilish vaqti bo'ldi!",
+	// 					"body_uz":      "Sizga preparat tayinlangan: ",
+	// 					"is_read":      false,
+	// 					"preparati_id": preparatId,
+	// 					"time_take":    stringTime,
+	// 				})
+	// 			}
+
+	// 			leng := len(requests)
+
+	// 			req := Request{
+	// 				Data: map[string]interface{}{
+	// 					"objects": requests,
+	// 				},
+	// 			}
+	// 			// fmt.Println("req --- >", req)
+	// 			Send("successfully created patient medications" + medicineTakingInt["guid"].(string) + "clients_id" + clientId + "preparati_id" + preparatId + "time_take" + timeTakeStr + "elements count " + strconv.Itoa(leng))
+
+	// 			jsonData, err := json.Marshal(req)
+	// 			if err != nil {
+	// 				Send("error marshal mult update req " + err.Error())
+	// 			}
+
+	// 			Send(string(jsonData))
+
+	// 			multipleUpdateTime := time.Now()
+
+	// 			err = MultipleUpdateObject(urlConst, "patient_medication", appId, req)
+	// 			if err != nil {
+	// 				return Handler("error 4", err.Error())
+
+	// 			}
+	// 			timeTook := time.Since(multipleUpdateTime).Seconds()
+	// 			s := fmt.Sprintf("%v", timeTook)
+	// 			Send(s + " seconds took to multiple update" + strconv.Itoa(leng) + "objects")
+
+	// 			_, err = DoRequest(multipleUpdateUrl+"notifications", "PUT", notifRequests, appId)
+	// 			if err != nil {
+	// 				return Handler("error 5", err.Error())
+
+	// 			}
+
+	// 			// req = Request{
+	// 			// 	Data: map[string]interface{}{
+	// 			// 		"objects": notifRequests,
+	// 			// 	},
+	// 			// }
+
+	// 			// err = MultipleUpdateObject(urlConst, "notifications", appId, req)
+	// 			// if err != nil {
+	// 			// 	response.Data = map[string]interface{}{"error in" + notifSlug + "multiple update, message": err.Error()}
+	// 			// 	response.Status = "error"
+	// 			// 	responseByte, _ := json.Marshal(response)
+	// 			// 	return string(responseByte)
+	// 			// }
+
+	// 		} else {
+	// 			Send("medicine taking not found")
+	// 			// medicine taking id not found no need to create any patient medications since we dont have any continious (always) medicine taking
+	// 			// fmt.Println("k", medicine_taking_id, "v", v.(map[string]interface{})["time_take"].(string), v.(map[string]interface{})["preparat_name"].(string), v.(map[string]interface{})["preparati_id"].(string))
+	// 		}
+	// 	}
+	// }
+
 	return ""
 }
 
@@ -309,7 +490,6 @@ func UpdateObject(url, tableSlug, appId string, request Request) (error, Respons
 	}
 	return nil, response
 }
-
 func UpdateObjectMany2Many(url, appId string, request RequestMany2Many) (error, Response) {
 	response := Response{}
 
@@ -385,4 +565,290 @@ func Send(text string) {
 
 	bot.Send(msg)
 
+}
+
+// func convertToWeekday(day string) time.Weekday {
+// 	switch day {
+// 	case "sunday":
+// 		return time.Sunday
+// 	case "monday":
+// 		return time.Monday
+// 	case "tuesday":
+// 		return time.Tuesday
+// 	case "wednesday":
+// 		return time.Wednesday
+// 	case "thursday":
+// 		return time.Thursday
+// 	case "friday":
+// 		return time.Friday
+// 	case "saturday":
+// 		return time.Saturday
+// 	default:
+// 		return time.Sunday // Return a default value (Sunday) in case of an invalid day.
+// 	}
+// }
+
+// func getDatesInRange(startDate, endDate time.Time, dayTimes []DayTime) []time.Time {
+// 	var datesInRange []time.Time
+
+// 	for current := startDate; !current.After(endDate); current = current.AddDate(0, 0, 1) {
+// 		for _, dt := range dayTimes {
+// 			day := convertToWeekday(dt.Day)
+// 			if current.Weekday() == day {
+// 				t, _ := time.Parse("15:04:05", dt.Time)
+// 				dateTime := current.Add(time.Hour*time.Duration(t.Hour()) + time.Minute*time.Duration(t.Minute()))
+// 				datesInRange = append(datesInRange, dateTime)
+// 			}
+// 		}
+// 	}
+
+// 	return datesInRange
+// }
+
+// func calculatePillDates(startDate, endDate time.Time, customData CustomDataObj) []time.Time {
+// 	var pillDates []time.Time
+
+// 	// Parse time from customData.Time
+// 	customTime, _ := time.Parse("15:04:05", customData.Time)
+
+// 	// Define the duration based on the cycle_name and cycle_count
+// 	var duration time.Duration
+// 	switch customData.CycleName {
+// 	case "day":
+// 		duration = time.Duration(customData.CycleCount) * 24 * time.Hour
+// 	case "month":
+// 		duration = time.Duration(customData.CycleCount) * 30 * 24 * time.Hour
+// 	default:
+// 		return pillDates
+// 	}
+
+// 	// Initialize the current date as the start date
+// 	currentDate := startDate
+
+// 	// Loop to calculate pill dates between startDate and endDate
+// 	for currentDate.Before(endDate) || currentDate.Equal(endDate) {
+// 		// Combine currentDate and customTime to get the pillDate
+// 		pillDate := currentDate.Add(time.Duration(customTime.Hour()) * time.Hour)
+// 		pillDate = pillDate.Add(time.Duration(customTime.Minute()) * time.Minute)
+// 		pillDate = pillDate.Add(time.Hour * -5)
+// 		// Add the pillDate to the result
+// 		pillDates = append(pillDates, pillDate)
+
+// 		// Move currentDate to the next cycle based on the duration
+// 		currentDate = currentDate.Add(duration)
+// 	}
+
+// 	return pillDates
+// }
+
+// week logics
+
+// func getDatesInRangeWeek(startDate, endDate string, days []string, cycleCount int, hourStr string) []DateObject {
+// 	layout := "2006-01-02"
+// 	start, err := time.Parse(layout, startDate)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	end, err := time.Parse(layout, endDate)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	currentTime := time.Now()
+// 	if hourStr == "" {
+// 		hourStr = currentTime.Format("15:04:05")
+// 	} else {
+// 		parsedTime, err := time.Parse("15:04:05", hourStr)
+// 		if err != nil {
+// 			// fmt.Println("Error parsing time:", err)
+// 			panic(err)
+// 		}
+// 		subtractedTime := parsedTime.Add(-5 * time.Hour)
+// 		outputLayout := "15:04:05"
+
+// 		hourStr = subtractedTime.Format(outputLayout)
+// 	}
+
+// 	dayDates := make([]DateObject, 0)
+
+// 	for !start.After(end) {
+// 		for _, day := range days {
+// 			weekday := getWeekday(day)
+// 			if start.Weekday() == weekday {
+// 				dateStr := start.Format(layout)
+// 				foundDay := false
+
+// 				// Check if the day already exists in the result slice
+// 				for i, obj := range dayDates {
+// 					if obj.Day == day {
+// 						dayDates[i].Dates = append(dayDates[i].Dates, dateStr)
+// 						foundDay = true
+// 						break
+// 					}
+// 				}
+
+// 				// If the day doesn't exist in the result slice, add a new DateObject
+// 				if !foundDay {
+// 					dayDates = append(dayDates, DateObject{
+// 						Day:   day,
+// 						Hour:  hourStr, // You can set your desired hour here
+// 						Dates: []string{dateStr},
+// 					})
+// 				}
+// 			}
+// 		}
+// 		start = start.AddDate(0, 0, 1)
+// 	}
+
+// 	// Add the hour to the dates and format them as "2023-07-11T14:00:00.000Z"
+// 	for i, obj := range dayDates {
+// 		for j, dateStr := range obj.Dates {
+// 			dayDates[i].Dates[j] = dateStr + "T" + obj.Hour + ".000Z"
+// 		}
+// 	}
+
+// 	return dayDates
+// }
+
+// func getWeekday(day string) time.Weekday {
+// 	switch day {
+// 	case "monday":
+// 		return time.Monday
+// 	case "tuesday":
+// 		return time.Tuesday
+// 	case "wednesday":
+// 		return time.Wednesday
+// 	case "thursday":
+// 		return time.Thursday
+// 	case "friday":
+// 		return time.Friday
+// 	case "saturday":
+// 		return time.Saturday
+// 	case "sunday":
+// 		return time.Sunday
+// 	default:
+// 		panic("Invalid weekday")
+// 	}
+// }
+
+type DateObject struct {
+	Day   string
+	Hour  string
+	Dates []string
+}
+
+// Datas This is response struct from create
+type Datas struct {
+	Data struct {
+		Data struct {
+			Data map[string]interface{} `json:"data"`
+		} `json:"data"`
+	} `json:"data"`
+}
+
+// ClientApiResponse This is get single api response
+type ClientApiResponse struct {
+	Data ClientApiData `json:"data"`
+}
+
+type ClientApiData struct {
+	Data ClientApiResp `json:"data"`
+}
+
+type ClientApiResp struct {
+	Response map[string]interface{} `json:"response"`
+}
+
+type Response struct {
+	Status string                 `json:"status"`
+	Data   map[string]interface{} `json:"data"`
+}
+
+// NewRequestBody's Data (map) field will be in this structure
+//.   fields
+// objects_ids []string
+// table_slug string
+// object_data map[string]interface
+// method string
+// app_id string
+
+// but all field will be an interface, you must do type assertion
+
+type HttpRequest struct {
+	Method  string      `json:"method"`
+	Path    string      `json:"path"`
+	Headers http.Header `json:"headers"`
+	Params  url.Values  `json:"params"`
+	Body    []byte      `json:"body"`
+}
+
+type AuthData struct {
+	Type string                 `json:"type"`
+	Data map[string]interface{} `json:"data"`
+}
+
+type NewRequestBody struct {
+	RequestData HttpRequest            `json:"request_data"`
+	Auth        AuthData               `json:"auth"`
+	Data        map[string]interface{} `json:"data"`
+}
+type Request struct {
+	Data map[string]interface{} `json:"data"`
+}
+
+type RequestMany2Many struct {
+	IdFrom    string   `json:"id_from"`
+	IdTo      []string `json:"id_to"`
+	TableFrom string   `json:"table_from"`
+	TableTo   string   `json:"table_to"`
+}
+
+// GetListClientApiResponse This is get list api response
+type GetListClientApiResponse struct {
+	Data GetListClientApiData `json:"data"`
+}
+
+type GetListClientApiData struct {
+	Data GetListClientApiResp `json:"data"`
+}
+
+type GetListClientApiResp struct {
+	Response []map[string]interface{} `json:"response"`
+}
+
+type CustomDataObj struct {
+	CycleName  string   `json:"cycle_name"`
+	CycleCount int      `json:"cycle_count"`
+	Time       string   `json:"time"`
+	Dates      []string `json:"dates"`
+}
+
+type DayTime struct {
+	Day  string `json:"day"`
+	Time string `json:"time"`
+}
+type DateTime struct {
+	Date string `json:"date"`
+	Time string `json:"time"`
+}
+
+type Medicine struct {
+	Type            string        `json:"type"`
+	DayData         []string      `json:"dayData"`
+	CustomData      CustomDataObj `json:"customData"`
+	WeekData        []DayTime     `json:"weekData"`
+	MonthData       []DateTime    `json:"monthData"`
+	BeforeAfterFood string        `json:"before_after_food"`
+	StartDate       string        `json:"start_date"`
+	EndDate         string        `json:"end_date"`
+	CurrentAmount   int           `json:"current_amount"`
+	DaysOfWeek      []int         `json:"days_of_week"`
+	HoursOfDay      []string      `json:"hours_of_day"`
+	WithoutBreak    bool          `json:"without_break"`
+}
+
+type MultipleUpdateRequest struct {
+	Data struct {
+		Objects []map[string]interface{} `json:"objects"`
+	} `json:"data"`
 }
